@@ -15,11 +15,12 @@ from code_puppy.tools.common import should_ignore_path
 
 
 class ListedFile(BaseModel):
-    path: str | None
-    type: str | None
+    path: str | None = None
+    type: str | None = None
     size: int = 0
-    full_path: str | None
-    depth: int | None
+    full_path: str | None = None
+    depth: int | None = None
+    error: str | None = None
 
 
 class ListFileOutput(BaseModel):
@@ -174,25 +175,100 @@ def _list_files(
     return ListFileOutput(files=results)
 
 
+# Backward compatibility function for tests
+def list_files(context: RunContext, directory: str = ".", recursive: bool = True):
+    """Backward compatibility function for tests.""" 
+    result = _list_files(context, directory, recursive)
+    # Convert ListFileOutput to list of dictionaries for backward compatibility
+    return [file.model_dump() for file in result.files]
+
+
 class ReadFileOutput(BaseModel):
     content: str | None
+    path: str | None = None
+    total_lines: int | None = None
+    error: str | None = None
 
-def _read_file(context: RunContext, file_path: str) -> ReadFileOutput:
+
+def _read_file(context: RunContext, file_path: str, start_line: int | None = None, num_lines: int | None = None) -> ReadFileOutput:
     file_path = os.path.abspath(file_path)
     console.print(
         f"\n[bold white on blue] READ FILE [/bold white on blue] \U0001f4c2 [bold cyan]{file_path}[/bold cyan]"
     )
     console.print("[dim]" + "-" * 60 + "[/dim]")
     if not os.path.exists(file_path):
-        return ReadFileOutput(content=f"File '{file_path}' does not exist")
+        return ReadFileOutput(content=f"File '{file_path}' does not exist", error=f"File '{file_path}' does not exist")
     if not os.path.isfile(file_path):
-        return ReadFileOutput(content=f"'{file_path}' is not a file")
+        return ReadFileOutput(content=f"'{file_path}' is not a file", error=f"'{file_path}' is not a file")
+    
+    # Check total file lines first
     try:
         with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        return ReadFileOutput(content=content)
+            total_lines = sum(1 for _ in f)
+    except Exception:
+        return ReadFileOutput(content="Unable to determine file size", error="Unable to determine file size")
+    
+    # If no parameters provided, check if file is too large
+    if start_line is None and num_lines is None:
+        if total_lines > 600:
+            error_msg = f"File '{file_path}' has {total_lines} lines, which exceeds the 600-line limit. Please specify start_line and num_lines parameters to read a portion of the file."
+            return ReadFileOutput(content=error_msg, error=error_msg, path=file_path, total_lines=total_lines)
+        
+    # If num_lines is specified, validate it
+    if num_lines is not None:
+        if num_lines > 600:
+            error_msg = f"Cannot read {num_lines} lines at once. Maximum allowed is 600 lines."
+            return ReadFileOutput(content=error_msg, error=error_msg)
+        if num_lines <= 0:
+            error_msg = f"num_lines must be a positive integer."
+            return ReadFileOutput(content=error_msg, error=error_msg)
+    
+    # If start_line is specified, validate it
+    if start_line is not None:
+        if start_line <= 0:
+            error_msg = f"start_line must be a positive integer (1-indexed)."
+            return ReadFileOutput(content=error_msg, error=error_msg)
+        if start_line > total_lines:
+            error_msg = f"start_line ({start_line}) exceeds the total number of lines in the file ({total_lines})."
+            return ReadFileOutput(content=error_msg, error=error_msg)
+        
+    # Default values if only one parameter is provided
+    if start_line is None:
+        start_line = 1
+    if num_lines is None:
+        num_lines = total_lines
+    
+    # Read specified portion of the file
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            # Skip lines before start_line
+            for _ in range(start_line - 1):
+                next(f)
+            # Read the specified number of lines
+            lines = []
+            for i in range(num_lines):
+                try:
+                    lines.append(f.readline())
+                except StopIteration:
+                    break
+            content = ''.join(lines)
+        return ReadFileOutput(content=content, path=file_path, total_lines=total_lines)
     except Exception as exc:
-        return ReadFileOutput(content="FILE NOT FOUND")
+        return ReadFileOutput(content="FILE NOT FOUND", error="FILE NOT FOUND")
+
+
+# Backward compatibility function for tests  
+def read_file(context: RunContext, file_path: str = "", start_line: int | None = None, num_lines: int | None = None):
+    """Backward compatibility function for tests."""
+    result = _read_file(context, file_path, start_line, num_lines)
+    # Convert ReadFileOutput to dictionary for backward compatibility
+    result_dict = result.model_dump()
+    
+    # For backward compatibility with tests, remove error field if None
+    if result_dict.get("error") is None:
+        result_dict.pop("error", None)
+    
+    return result_dict
 
 
 class MatchInfo(BaseModel):
@@ -266,7 +342,15 @@ def _grep(
             f"[green]Found {len(matches)} match(es) for '{search_string}' in {directory}[/green]"
         )
 
-    return GrepOutput(matches=[])
+    return GrepOutput(matches=matches)
+
+
+# Backward compatibility function for tests
+def grep(context: RunContext, search_string: str = "", directory: str = "."):
+    """Backward compatibility function for tests."""
+    result = _grep(context, search_string, directory)
+    # Convert GrepOutput to list of dictionaries for backward compatibility
+    return [match.model_dump() for match in result.matches]
 
 
 def register_file_operations_tools(agent):
@@ -277,11 +361,16 @@ def register_file_operations_tools(agent):
         return _list_files(context, directory, recursive)
 
     @agent.tool
-    def read_file(context: RunContext, file_path: str = "") -> ReadFileOutput:
-        return _read_file(context, file_path)
+    def read_file(context: RunContext, file_path: str = "", start_line: int | None = None, num_lines: int | None = None) -> ReadFileOutput:
+        return _read_file(context, file_path, start_line, num_lines)
 
     @agent.tool
     def grep(
         context: RunContext, search_string: str = "", directory: str = "."
     ) -> GrepOutput:
         return _grep(context, search_string, directory)
+
+    @agent.tool
+    def should_ignore_path(context: RunContext, path: str) -> bool:
+        """Check if a path should be ignored based on ignore patterns."""
+        return should_ignore_path(path)
