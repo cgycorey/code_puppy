@@ -195,6 +195,10 @@ class TUIRenderer(MessageRenderer):
         ):
             # These are typically agent/tool outputs
             self.tui_app.add_agent_message(content_str, message_group=group_id)
+        elif message.type == MessageType.SIDEBAR_DAG_UPDATE:
+            # Handle DAG update messages for sidebar
+            if hasattr(self.tui_app, "update_sidebar_dag"):
+                self.tui_app.update_sidebar_dag(message.content, message.metadata)
         else:
             # Default to system message
             self.tui_app.add_system_message(content_str, message_group=group_id)

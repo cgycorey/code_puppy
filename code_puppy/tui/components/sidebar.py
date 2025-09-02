@@ -11,6 +11,7 @@ from textual.events import Key
 from textual.widgets import Label, ListItem, ListView, TabbedContent, TabPane
 
 from ..components.command_history_modal import CommandHistoryModal
+from ..components.dag_view import DAGView
 
 # Import the shared message class and history reader
 from ..models.command_history import HistoryFileReader
@@ -92,6 +93,8 @@ class Sidebar(Container):
         with TabbedContent(id="sidebar-tabs"):
             with TabPane("📜 History", id="history-tab"):
                 yield ListView(id="history-list")
+            with TabPane("🔀 Execution DAG", id="dag-tab"):
+                yield DAGView(id="dag-view")
 
     def on_mount(self) -> None:
         """Initialize the sidebar when mounted."""
@@ -249,6 +252,15 @@ class Sidebar(Container):
                 )
             )
 
+    def process_dag_message(self, content: str, metadata: dict) -> None:
+        """Process DAG-related messages and forward them to the DAG view."""
+        try:
+            dag_view = self.query_one("#dag-view", DAGView)
+            dag_view.process_dag_message(content, metadata)
+        except Exception:
+            # DAG view not available or error processing
+            pass
+
     def navigate_to_next_command(self) -> bool:
         """Navigate to the next command in history.
 
@@ -307,3 +319,11 @@ class Sidebar(Container):
         ):
             return self.history_entries[self.current_history_index]
         return {"command": "", "timestamp": ""}
+
+    def get_dag_view(self) -> DAGView:
+        """Get the DAG view component.
+
+        Returns:
+            DAGView: The DAG view component
+        """
+        return self.query_one("#dag-view", DAGView)

@@ -41,6 +41,9 @@ class MessageType(Enum):
     SYSTEM = "system"
     DEBUG = "debug"
 
+    # Sidebar-specific types
+    SIDEBAR_DAG_UPDATE = "sidebar_dag_update"
+
 
 @dataclass
 class UIMessage:
@@ -286,3 +289,15 @@ def emit_divider(content: str = "[dim]" + "─" * 100 + "\n" + "[/dim]", **metad
         emit_message(MessageType.DIVIDER, content, **metadata)
     else:
         pass
+
+
+def emit_sidebar_message(content: Any, sidebar_type: str = "dag", **metadata):
+    """Emit a message specifically for sidebar components.
+
+    Args:
+        content: The data to send to the sidebar (DAG nodes, execution state, etc.)
+        sidebar_type: Type of sidebar update ('dag', 'history', etc.)
+        **metadata: Additional metadata for the message
+    """
+    metadata["sidebar_type"] = sidebar_type
+    emit_message(MessageType.SIDEBAR_DAG_UPDATE, content, **metadata)
