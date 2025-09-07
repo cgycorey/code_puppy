@@ -1,0 +1,40 @@
+flowchart TD
+    A[Controller/CLI] --> B{Process Dispatcher}
+    B --> C[Sub-Agent Process]
+    C --> D[Agent Execution]
+    D --> E[Reasoning Output]
+    E --> F[stdout Stream]
+    F --> G[Controller captures reasoning]
+    G --> H[State Manager updates]
+    D --> I[Task Results]
+    I --> J[stdout Output]
+    J --> K[Controller captures results]
+    K --> H
+    
+    L[Agent Tools] --> B
+    L --> M[State Manager queries]
+    M --> N[Return status info]
+    N --> L
+    
+    B --> O[Visibility Handlers]
+    O --> P[Platform-specific Terminal Operations]
+    P --> C
+    
+    H --> L
+    
+    Q[Config Manager] -.-> B
+    Q -.-> C
+    Q -.-> H
+    Q -.-> L
+    
+    R[Periodic Polling] --> H
+    
+    classDef component fill:#f9f,stroke:#333;
+    classDef process fill:#bbf,stroke:#333;
+    classDef data fill:#fbf,stroke:#333;
+    classDef tool fill:#ffd,stroke:#333;
+    
+    class A,L,M,O,Q,R,component
+    class B,C,D,process
+    class E,F,G,I,J,K,H,data
+    class L,tool
