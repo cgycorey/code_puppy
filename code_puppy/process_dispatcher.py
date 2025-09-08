@@ -2,6 +2,8 @@ import subprocess
 import uuid
 import time
 import sys
+import platform
+import shlex
 from typing import List, Dict, Optional, Any, Tuple
 import psutil
 
@@ -58,13 +60,34 @@ class ProcessDispatcher:
             # Build the command to run the sub-agent
             command = self.build_agent_command(agent_name, agent_id, prompt, model)
             
-            # Start the subprocess
-            process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+            if visible and platform.system() == "Darwin":  # macOS
+                # For visible mode on macOS, use osascript to open a new terminal window
+                # We need to join the command parts properly for shell execution
+                cmd_str = " ".join(shlex.quote(arg) for arg in command)
+                
+                # Create osascript command to open Terminal with our command
+                osa_script = f'''
+                tell application "Terminal"
+                    do script "{cmd_str}"
+                    activate
+                end tell
+                '''
+                
+                # Start the subprocess using osascript
+                process = subprocess.Popen(
+                    ["osascript", "-e", osa_script],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+            else:
+                # Start the subprocess normally (hidden mode)
+                process = subprocess.Popen(
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
             
             # Store the process with its start time
             process_info = ProcessInfo(process, time.time())

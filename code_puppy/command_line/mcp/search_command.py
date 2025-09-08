@@ -34,7 +34,7 @@ class SearchCommand(MCPCommandBase):
             group_id = self.generate_group_id()
 
         try:
-            from code_puppy.mcp.server_registry_catalog import catalog
+            from code_puppy._mcp.server_registry_catalog import catalog
 
             if not args:
                 # Show popular servers if no query
@@ -57,7 +57,7 @@ class SearchCommand(MCPCommandBase):
                     message_group=group_id,
                 )
                 emit_info(
-                    "Try: /mcp search database, /mcp search file, /mcp search git",
+                    "Try: /_mcp search database, /_mcp search file, /_mcp search git",
                     message_group=group_id,
                 )
                 return
@@ -99,10 +99,10 @@ class SearchCommand(MCPCommandBase):
             emit_system_message(table, message_group=group_id)
             emit_info("\n[dim]✓ = Verified  ⭐ = Popular[/dim]", message_group=group_id)
             emit_info(
-                "[yellow]To install:[/yellow] /mcp install <id>", message_group=group_id
+                "[yellow]To install:[/yellow] /_mcp install <id>", message_group=group_id
             )
             emit_info(
-                "[yellow]For details:[/yellow] /mcp search <specific-term>",
+                "[yellow]For details:[/yellow] /_mcp search <specific-term>",
                 message_group=group_id,
             )
 

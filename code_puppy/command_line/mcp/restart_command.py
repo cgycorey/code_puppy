@@ -33,7 +33,7 @@ class RestartCommand(MCPCommandBase):
             group_id = self.generate_group_id()
 
         if not args:
-            emit_info("Usage: /mcp restart <server_name>", message_group=group_id)
+            emit_info("Usage: /_mcp restart <server_name>", message_group=group_id)
             return
 
         server_name = args[0]

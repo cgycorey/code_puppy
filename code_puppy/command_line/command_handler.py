@@ -47,7 +47,7 @@ def get_commands_help():
         + Text(" <agent> <model>  Pin a specific model to an agent")
     )
     help_lines.append(
-        Text("/mcp", style="cyan")
+        Text("/_mcp", style="cyan")
         + Text("                  Manage MCP servers (list, start, stop, status, etc.)")
     )
     help_lines.append(
@@ -390,7 +390,7 @@ def handle_command(command: str):
         emit_warning(f"Available models: {', '.join(model_names)}")
         return True
 
-    if command.startswith("/mcp"):
+    if command.startswith("/_mcp"):
         from code_puppy.command_line.mcp import MCPCommandHandler
 
         handler = MCPCommandHandler()

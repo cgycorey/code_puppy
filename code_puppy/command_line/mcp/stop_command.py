@@ -34,7 +34,7 @@ class StopCommand(MCPCommandBase):
 
         if not args:
             emit_info(
-                "[yellow]Usage: /mcp stop <server_name>[/yellow]",
+                "[yellow]Usage: /_mcp stop <server_name>[/yellow]",
                 message_group=group_id,
             )
             return

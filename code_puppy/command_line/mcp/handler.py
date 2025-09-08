@@ -41,9 +41,9 @@ class MCPCommandHandler(MCPCommandBase):
 
     Example usage:
         handler = MCPCommandHandler()
-        handler.handle_mcp_command("/mcp list")
-        handler.handle_mcp_command("/mcp start filesystem")
-        handler.handle_mcp_command("/mcp status filesystem")
+        handler.handle_mcp_command("/_mcp list")
+        handler.handle_mcp_command("/_mcp start filesystem")
+        handler.handle_mcp_command("/_mcp status filesystem")
     """
 
     def __init__(self):
@@ -75,7 +75,7 @@ class MCPCommandHandler(MCPCommandBase):
         Handle MCP commands and route to appropriate handler.
 
         Args:
-            command: The full command string (e.g., "/mcp list", "/mcp start server")
+            command: The full command string (e.g., "/_mcp list", "/_mcp start server")
 
         Returns:
             True if command was handled successfully, False otherwise
@@ -83,12 +83,12 @@ class MCPCommandHandler(MCPCommandBase):
         group_id = self.generate_group_id()
 
         try:
-            # Remove /mcp prefix and parse arguments
+            # Remove /_mcp prefix and parse arguments
             command = command.strip()
-            if not command.startswith("/mcp"):
+            if not command.startswith("/_mcp"):
                 return False
 
-            # Remove the /mcp prefix
+            # Remove the /_mcp prefix
             args_str = command[4:].strip()
 
             # If no subcommand, show status dashboard
@@ -123,7 +123,7 @@ class MCPCommandHandler(MCPCommandBase):
                     message_group=group_id,
                 )
                 emit_info(
-                    "Type '/mcp help' for available commands", message_group=group_id
+                    "Type '/_mcp help' for available commands", message_group=group_id
                 )
                 return True
 

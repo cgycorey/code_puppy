@@ -35,7 +35,7 @@ class StartCommand(MCPCommandBase):
 
         if not args:
             emit_info(
-                "[yellow]Usage: /mcp start <server_name>[/yellow]",
+                "[yellow]Usage: /_mcp start <server_name>[/yellow]",
                 message_group=group_id,
             )
             return

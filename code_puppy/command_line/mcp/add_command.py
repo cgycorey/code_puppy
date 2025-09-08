@@ -29,11 +29,11 @@ class AddCommand(MCPCommandBase):
         Add a new MCP server from JSON configuration or launch wizard.
 
         Usage:
-            /mcp add                    - Launch interactive wizard
-            /mcp add <json>             - Add server from JSON config
+            /_mcp add                    - Launch interactive wizard
+            /_mcp add <json>             - Add server from JSON config
 
         Example JSON:
-            /mcp add {"name": "test", "type": "stdio", "command": "echo", "args": ["hello"]}
+            /_mcp add {"name": "test", "type": "stdio", "command": "echo", "args": ["hello"]}
 
         Args:
             args: Command arguments - JSON config or empty for wizard
@@ -64,11 +64,11 @@ class AddCommand(MCPCommandBase):
                 except json.JSONDecodeError as e:
                     emit_info(f"Invalid JSON: {e}", message_group=group_id)
                     emit_info(
-                        "Usage: /mcp add <json> or /mcp add (for wizard)",
+                        "Usage: /_mcp add <json> or /_mcp add (for wizard)",
                         message_group=group_id,
                     )
                     emit_info(
-                        'Example: /mcp add {"name": "test", "type": "stdio", "command": "echo"}',
+                        'Example: /_mcp add {"name": "test", "type": "stdio", "command": "echo"}',
                         message_group=group_id,
                     )
                     return
@@ -94,7 +94,7 @@ class AddCommand(MCPCommandBase):
                         pass
 
                     emit_info(
-                        "Use '/mcp list' to see all servers", message_group=group_id
+                        "Use '/_mcp list' to see all servers", message_group=group_id
                     )
 
             else:
@@ -130,7 +130,7 @@ class AddCommand(MCPCommandBase):
         """
         try:
             from code_puppy.config import MCP_SERVERS_FILE
-            from code_puppy.mcp.managed_server import ServerConfig
+            from code_puppy._mcp.managed_server import ServerConfig
 
             # Extract required fields
             name = config_dict.pop("name")

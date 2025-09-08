@@ -148,7 +148,7 @@ MCP_SERVER_REGISTRY: List[MCPServerTemplate] = [
                 "--from",
                 "git+https://github.com/oraios/serena",
                 "serena",
-                "start-mcp-server",
+                "start-_mcp-server",
             ],
         },
         verified=True,
@@ -308,7 +308,7 @@ MCP_SERVER_REGISTRY: List[MCPServerTemplate] = [
         type="stdio",
         config={
             "command": "npx",
-            "args": ["-y", "mcp-sqlite", "${db_path}"],
+            "args": ["-y", "_mcp-sqlite", "${db_path}"],
             "timeout": 30,
         },
         verified=True,
@@ -664,7 +664,7 @@ MCP_SERVER_REGISTRY: List[MCPServerTemplate] = [
         popular=True,
         requires=MCPServerRequirements(
             required_tools=["python", "pip"],
-            package_dependencies=["pandas", "mcp-server-pandas"],
+            package_dependencies=["pandas", "_mcp-server-pandas"],
         ),
     ),
     MCPServerTemplate(
@@ -683,7 +683,7 @@ MCP_SERVER_REGISTRY: List[MCPServerTemplate] = [
         verified=True,
         requires=MCPServerRequirements(
             required_tools=["python", "pip", "jupyter"],
-            package_dependencies=["jupyter", "mcp-server-jupyter"],
+            package_dependencies=["jupyter", "_mcp-server-jupyter"],
         ),
     ),
     # ========== Cloud Services ==========
@@ -754,7 +754,7 @@ MCP_SERVER_REGISTRY: List[MCPServerTemplate] = [
         category="Security",
         tags=["security", "password", "vault", "1password", "secrets"],
         type="stdio",
-        config={"command": "op", "args": ["mcp-server"], "timeout": 30},
+        config={"command": "op", "args": ["_mcp-server"], "timeout": 30},
         verified=True,
         requires=MCPServerRequirements(
             required_tools=["op"],
@@ -795,14 +795,14 @@ MCP_SERVER_REGISTRY: List[MCPServerTemplate] = [
         config={
             "timeout": 30,
             "command": "npx",
-            "args": ["-y", "@upstash/context7-mcp", "--api-key", "$CONTEXT7_API_KEY"],
+            "args": ["-y", "@upstash/context7-_mcp", "--api-key", "$CONTEXT7_API_KEY"],
         },
         verified=True,
         popular=True,
         requires=MCPServerRequirements(
             environment_vars=["CONTEXT7_API_KEY"],
             required_tools=["node", "npx"],
-            package_dependencies=["@upstash/context7-mcp"],
+            package_dependencies=["@upstash/context7-_mcp"],
         ),
         example_usage="Cloud-based service - no local setup required",
     ),
@@ -999,7 +999,7 @@ MCP_SERVER_REGISTRY: List[MCPServerTemplate] = [
         config={"command": "python", "args": ["-m", "mcp_server_pypi"], "timeout": 30},
         verified=True,
         requires=MCPServerRequirements(
-            required_tools=["python", "pip"], package_dependencies=["mcp-server-pypi"]
+            required_tools=["python", "pip"], package_dependencies=["_mcp-server-pypi"]
         ),
     ),
 ]

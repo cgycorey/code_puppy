@@ -33,7 +33,7 @@ class TestCommand(MCPCommandBase):
             group_id = self.generate_group_id()
 
         if not args:
-            emit_info("Usage: /mcp test <server_name>", message_group=group_id)
+            emit_info("Usage: /_mcp test <server_name>", message_group=group_id)
             return
 
         server_name = args[0]
@@ -82,7 +82,7 @@ class TestCommand(MCPCommandBase):
 
                 if not managed_server.is_enabled():
                     emit_info(
-                        "  • Server is disabled - enable it with '/mcp start'",
+                        "  • Server is disabled - enable it with '/_mcp start'",
                         message_group=group_id,
                     )
 

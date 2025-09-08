@@ -692,7 +692,7 @@ class CodePuppyTUI(App):
                 if result.get("server_name"):
                     server_name = result["server_name"]
                     self.add_system_message(
-                        f"💡 Use '/mcp start {server_name}' to start the server"
+                        f"💡 Use '/_mcp start {server_name}' to start the server"
                     )
             elif (
                 result

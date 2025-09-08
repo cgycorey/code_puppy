@@ -96,10 +96,10 @@ async def main():
             
         try:
             # Import the agent tools
-            from code_puppy.tools.agent_tools import run_agent_in_child_mode
+            from code_puppy.tools.agent_tools import run_agent_in_child_mode_sync
             
             # Run the agent in child mode
-            response = run_agent_in_child_mode(args.agent, args.prompt)
+            response = run_agent_in_child_mode_sync(args.agent, args.prompt)
             
             # Output the result to stdout
             print(response)

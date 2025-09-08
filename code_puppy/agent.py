@@ -48,7 +48,7 @@ _code_generation_agent = None
 def _load_mcp_servers(extra_headers: Optional[Dict[str, str]] = None):
     """Load MCP servers using the new manager while maintaining backward compatibility."""
     from code_puppy.config import get_value, load_mcp_server_configs
-    from code_puppy.mcp import ServerConfig, get_mcp_manager
+    from code_puppy._mcp import ServerConfig, get_mcp_manager
 
     # Check if MCP servers are disabled
     mcp_disabled = get_value("disable_mcp_servers")
@@ -113,7 +113,7 @@ def _load_mcp_servers(extra_headers: Optional[Dict[str, str]] = None):
 
 def reload_mcp_servers():
     """Reload MCP servers without restarting the agent."""
-    from code_puppy.mcp import get_mcp_manager
+    from code_puppy._mcp import get_mcp_manager
 
     manager = get_mcp_manager()
     # Reload configurations

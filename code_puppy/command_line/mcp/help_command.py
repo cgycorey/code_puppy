@@ -46,11 +46,11 @@ class HelpCommand(MCPCommandBase):
             # Registry Commands
             help_lines.append(Text("Registry Commands:", style="bold cyan"))
             help_lines.append(
-                Text("/mcp search", style="cyan")
+                Text("/_mcp search", style="cyan")
                 + Text(" [query]     Search 30+ pre-configured servers")
             )
             help_lines.append(
-                Text("/mcp install", style="cyan")
+                Text("/_mcp install", style="cyan")
                 + Text(" <id>       Install server from registry")
             )
             help_lines.append(Text(""))
@@ -58,31 +58,31 @@ class HelpCommand(MCPCommandBase):
             # Core Commands
             help_lines.append(Text("Core Commands:", style="bold cyan"))
             help_lines.append(
-                Text("/mcp", style="cyan")
+                Text("/_mcp", style="cyan")
                 + Text("                    Show server status dashboard")
             )
             help_lines.append(
-                Text("/mcp list", style="cyan")
+                Text("/_mcp list", style="cyan")
                 + Text("               List all registered servers")
             )
             help_lines.append(
-                Text("/mcp start", style="cyan")
+                Text("/_mcp start", style="cyan")
                 + Text(" <name>       Start a specific server")
             )
             help_lines.append(
-                Text("/mcp start-all", style="cyan")
+                Text("/_mcp start-all", style="cyan")
                 + Text("          Start all servers")
             )
             help_lines.append(
-                Text("/mcp stop", style="cyan")
+                Text("/_mcp stop", style="cyan")
                 + Text(" <name>        Stop a specific server")
             )
             help_lines.append(
-                Text("/mcp stop-all", style="cyan")
+                Text("/_mcp stop-all", style="cyan")
                 + Text(" [group_id]  Stop all running servers")
             )
             help_lines.append(
-                Text("/mcp restart", style="cyan")
+                Text("/_mcp restart", style="cyan")
                 + Text(" <name>     Restart a specific server")
             )
             help_lines.append(Text(""))
@@ -90,27 +90,27 @@ class HelpCommand(MCPCommandBase):
             # Management Commands
             help_lines.append(Text("Management Commands:", style="bold cyan"))
             help_lines.append(
-                Text("/mcp status", style="cyan")
+                Text("/_mcp status", style="cyan")
                 + Text(" [name]      Show detailed status (all servers or specific)")
             )
             help_lines.append(
-                Text("/mcp test", style="cyan")
+                Text("/_mcp test", style="cyan")
                 + Text(" <name>        Test connectivity to a server")
             )
             help_lines.append(
-                Text("/mcp logs", style="cyan")
+                Text("/_mcp logs", style="cyan")
                 + Text(" <name> [limit] Show recent events (default limit: 10)")
             )
             help_lines.append(
-                Text("/mcp add", style="cyan")
+                Text("/_mcp add", style="cyan")
                 + Text(" [json]         Add new server (JSON or wizard)")
             )
             help_lines.append(
-                Text("/mcp remove", style="cyan")
+                Text("/_mcp remove", style="cyan")
                 + Text(" <name>      Remove/disable a server")
             )
             help_lines.append(
-                Text("/mcp help", style="cyan")
+                Text("/_mcp help", style="cyan")
                 + Text("               Show this help message")
             )
             help_lines.append(Text(""))
@@ -124,12 +124,12 @@ class HelpCommand(MCPCommandBase):
 
             # Examples
             help_lines.append(Text("Examples:", style="bold"))
-            examples_text = """/mcp search database     # Find database servers
-/mcp install postgres    # Install PostgreSQL server
-/mcp start filesystem    # Start a specific server
-/mcp start-all           # Start all servers at once
-/mcp stop-all            # Stop all running servers
-/mcp add {"name": "test", "type": "stdio", "command": "echo"}"""
+            examples_text = """/_mcp search database     # Find database servers
+/_mcp install postgres    # Install PostgreSQL server
+/_mcp start filesystem    # Start a specific server
+/_mcp start-all           # Start all servers at once
+/_mcp stop-all            # Stop all running servers
+/_mcp add {"name": "test", "type": "stdio", "command": "echo"}"""
             help_lines.append(Text(examples_text, style="dim"))
 
             # Combine all lines

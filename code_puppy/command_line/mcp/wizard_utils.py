@@ -66,7 +66,7 @@ def interactive_server_selection(group_id: str):
     # This is a simplified version - the full implementation would have
     # category browsing, search, etc. For now, we'll just show popular servers
     try:
-        from code_puppy.mcp.server_registry_catalog import catalog
+        from code_puppy._mcp.server_registry_catalog import catalog
 
         servers = catalog.get_popular(10)
         if not servers:
@@ -194,7 +194,7 @@ def install_server_from_catalog(
         import os
 
         from code_puppy.config import MCP_SERVERS_FILE
-        from code_puppy.mcp.managed_server import ServerConfig
+        from code_puppy._mcp.managed_server import ServerConfig
 
         # Create server configuration
         config_dict = selected_server.get_config_template()
@@ -247,7 +247,7 @@ def install_server_from_catalog(
             message_group=group_id,
         )
         emit_info(
-            "Use '/mcp start {}' to start the server".format(server_name),
+            "Use '/_mcp start {}' to start the server".format(server_name),
             message_group=group_id,
         )
 

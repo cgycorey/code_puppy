@@ -37,7 +37,7 @@ class LogsCommand(MCPCommandBase):
             group_id = self.generate_group_id()
 
         if not args:
-            emit_info("Usage: /mcp logs <server_name> [limit]", message_group=group_id)
+            emit_info("Usage: /_mcp logs <server_name> [limit]", message_group=group_id)
             return
 
         server_name = args[0]
