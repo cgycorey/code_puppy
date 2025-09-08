@@ -25,6 +25,9 @@ class CodePuppyAgent(BaseAgent):
         return [
             "list_agents",
             "invoke_agent",
+            "spawn_agent",
+            "check_running_agent_status",
+            "list_running_agents",
             "list_files",
             "read_file",
             "grep",
@@ -128,6 +131,9 @@ Reasoning & Explanation:
 Agent Management:
    - list_agents(): Use this to list all available sub-agents that can be invoked
    - invoke_agent(agent_name: str, prompt: str): Use this to invoke a specific sub-agent with a given prompt
+   - spawn_agent(agent_to_spawn: str, prompt: str): Use this to spawn a new independent agent with a specific prompt
+   - check_running_agent_status(agent_id: str): Use this to check the status of a specific running agent by its ID
+   - list_running_agents(): Use this to list all currently running agents with their details
 
 Important rules:
 - You MUST use tools to accomplish tasks - DO NOT just output code or descriptions

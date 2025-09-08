@@ -2,6 +2,9 @@ from code_puppy.messaging import emit_warning
 from code_puppy.tools.agent_tools import (
     register_list_agents,
     register_invoke_agent,
+    register_spawn_agent,
+    register_check_running_agent_status,
+    register_list_running_agents,
 )
 from code_puppy.tools.command_runner import (
     register_agent_run_shell_command,
@@ -20,6 +23,9 @@ TOOL_REGISTRY = {
     # Agent Tools
     "list_agents": register_list_agents,
     "invoke_agent": register_invoke_agent,
+    "spawn_agent": register_spawn_agent,
+    "check_running_agent_status": register_check_running_agent_status,
+    "list_running_agents": register_list_running_agents,
     # File Operations
     "list_files": register_list_files,
     "read_file": register_read_file,

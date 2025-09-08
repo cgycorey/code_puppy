@@ -384,6 +384,7 @@ def handle_command(command: str):
             emit_success(f"Active model set and loaded: {model}")
             return True
         # If no model matched, show available models
+        from code_puppy.command_line.model_picker_completion import load_model_names
         model_names = load_model_names()
         emit_warning("Usage: /model <model-name> or /m <model-name>")
         emit_warning(f"Available models: {', '.join(model_names)}")

@@ -34,5 +34,5 @@ The YOLO_MODE field shows `[red]ON[/red]` (bold, red) if active, or `[yellow]off
   - If neither are set, defaults to OFF (False).
 
 ## See Also
-- [`code_puppy/command_line/meta_command_handler.py`](code_puppy/command_line/meta_command_handler.py)
+- [`code_puppy/command_line/command_handler.py`](code_puppy/command_line/command_handler.py)
 - [`code_puppy/config.py`](code_puppy/config.py)

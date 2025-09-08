@@ -46,6 +46,21 @@ async def main():
         help="Show version and exit",
     )
     parser.add_argument(
+        "--child-mode",
+        action="store_true",
+        help="Run in child mode for sub-agent execution",
+    )
+    parser.add_argument(
+        "--task-id",
+        type=str,
+        help="Task ID for child mode execution",
+    )
+    parser.add_argument(
+        "--agent",
+        type=str,
+        help="Agent name to invoke in child mode",
+    )
+    parser.add_argument(
         "--interactive",
         "-i",
         action="store_true",
@@ -68,6 +83,31 @@ async def main():
         "command", nargs="*", help="Run a single command (deprecated, use -p instead)"
     )
     args = parser.parse_args()
+
+    # Handle child mode execution
+    if args.child_mode:
+        # In child mode, we don't need TUI
+        set_tui_mode(False)
+        
+        # Validate required arguments
+        if not args.task_id or not args.agent or not args.prompt:
+            print("Error: Child mode requires --task-id, --agent, and --prompt arguments")
+            sys.exit(1)
+            
+        try:
+            # Import the agent tools
+            from code_puppy.tools.agent_tools import run_agent_in_child_mode
+            
+            # Run the agent in child mode
+            response = run_agent_in_child_mode(args.agent, args.prompt)
+            
+            # Output the result to stdout
+            print(response)
+            sys.exit(0)
+                
+        except Exception as e:
+            print(f"Error in child mode execution: {str(e)}")
+            sys.exit(1)
 
     if args.tui or args.web:
         set_tui_mode(True)

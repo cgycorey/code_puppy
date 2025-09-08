@@ -125,6 +125,9 @@ Users can optionally pin a specific model to their agent to override the global 
 - `agent_share_your_reasoning` - Explain thought processes (recommended for most agents)
 - `list_agents` - List all available sub-agents (recommended for agent managers)
 - `invoke_agent` - Invoke other agents with specific prompts (recommended for agent managers)
+- `spawn_agent` - Spawn new agents with specific prompts (recommended for agent orchestrators)
+- `check_running_agent_status` - Check the status of a running agent by ID (recommended for agent managers)
+- `list_running_agents` - List all currently running agents (recommended for agent managers)
 
 ## Detailed Tool Documentation (Instructions for Agent Creation)
 
@@ -231,6 +234,51 @@ Best-practice guidelines for `invoke_agent`:
 • Be specific in your prompts to get better results
 • Avoid circular dependencies (don't invoke yourself!)
 
+#### `spawn_agent(agent_to_spawn: str, prompt: str)`
+Use this to spawn a new agent instance with a specific prompt. This allows agents to create new independent agent processes.
+
+Arguments:
+- agent_to_spawn (required): Name of the agent to spawn
+- prompt (required): The prompt to initialize the spawned agent with
+
+Example usage:
+```python
+spawn_agent(agent_to_spawn="python-tutor", prompt="Help me understand list comprehensions")
+```
+
+Best-practice guidelines for `spawn_agent`:
+• Only spawn agents that exist (use `list_agents` to verify)
+• Clearly specify what you want the spawned agent to do
+• Be specific in your prompts to get better results
+• Remember that spawned agents run independently
+
+#### `check_running_agent_status(agent_id: str)`
+Use this to check the status of a specific running agent by its ID.
+
+Arguments:
+- agent_id (required): The unique ID of the agent to check
+
+Example usage:
+```python
+check_running_agent_status(agent_id="123e4567-e89b-12d3-a456-426614174000")
+```
+
+Best-practice guidelines for `check_running_agent_status`:
+• Use the agent ID returned from `spawn_agent` to track a specific agent
+• This tool helps monitor the execution status of concurrently running agents
+
+#### `list_running_agents()`
+Use this to get a list of all currently running agents with their details.
+
+Example usage:
+```python
+list_running_agents()
+```
+
+Best-practice guidelines for `list_running_agents`:
+• Use this to get an overview of all agents currently executing
+• Each running agent includes its ID, name, and current status
+
 ### Important Rules for Agent Creation:
 - You MUST use tools to accomplish tasks - DO NOT just output code or descriptions
 - Before every other tool use, you must use "share_your_reasoning" to explain your thought process and planned next steps
@@ -262,6 +310,9 @@ Available templates for tools:
 - `agent_share_your_reasoning`: Standard reasoning sharing operations
 - `list_agents`: Standard agent listing operations
 - `invoke_agent`: Standard agent invocation operations
+- `spawn_agent`: Standard agent spawning operations
+- `check_running_agent_status`: Standard agent status checking operations
+- `list_running_agents`: Standard running agents listing operations
 
 Each agent you create should only include templates for tools it actually uses. The `edit_file` tool template
 should always include its detailed usage instructions when selected.
@@ -332,6 +383,7 @@ This detailed documentation should be copied verbatim into any agent that will b
 **For "Code reviewer":** → Suggest `list_files`, `read_file`, `grep`, `agent_share_your_reasoning`
 **For "File organizer":** → Suggest `list_files`, `read_file`, `edit_file`, `delete_file`, `agent_share_your_reasoning`
 **For "Agent orchestrator":** → Suggest `list_agents`, `invoke_agent`, `agent_share_your_reasoning`
+**For "Agent manager":** → Suggest `list_agents`, `invoke_agent`, `spawn_agent`, `check_running_agent_status`, `list_running_agents`
 
 ## Model Selection Guidance:
 
@@ -435,7 +487,7 @@ Your goal is to take users from idea to working agent in one smooth conversation
 
     def get_available_tools(self) -> List[str]:
         """Get all tools needed for agent creation."""
-        return ["list_files", "read_file", "edit_file", "agent_share_your_reasoning", "list_agents", "invoke_agent"]
+        return ["list_files", "read_file", "edit_file", "agent_share_your_reasoning", "list_agents", "invoke_agent", "spawn_agent", "check_running_agent_status", "list_running_agents"]
 
     def validate_agent_json(self, agent_config: Dict) -> List[str]:
         """Validate a JSON agent configuration.
