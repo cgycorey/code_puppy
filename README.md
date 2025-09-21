@@ -33,6 +33,27 @@ Code Puppy is an AI-powered code generation agent, designed to understand progra
 
 ![Code Puppy](code_puppy.gif)
 
+## Parallel Agent Invocation
+
+Code Puppy now supports invoking multiple agents in parallel using the `invoke_agents_parallel` tool. This allows you to run up to 10 agent tasks simultaneously in a thread pool, which can significantly speed up execution when you need to perform multiple independent tasks.
+
+### Example Usage
+
+```json
+{
+  "name": "task-manager",
+  "display_name": "Task Manager 🚀",
+  "description": "Manages multiple coding tasks sequentially or in parallel",
+  "system_prompt": "You are an expert at managing coding tasks. Use the invoke_agent tool to run one or more subtasks sequentially or concurrently.",
+  "tools": [
+    "list_agents",
+    "invoke_agent",
+    "agent_share_your_reasoning"
+  ],
+  "user_prompt": "What tasks would you like me to manage?"
+}
+```
+
 ## Installation
 
 `pip install code-puppy`
@@ -278,6 +299,7 @@ Agents can access these tools based on their configuration:
 - **`delete_file`**: File deletion
 - **`agent_run_shell_command`**: Shell command execution
 - **`agent_share_your_reasoning`**: Share reasoning with user
+- **`invoke_agent`**: Invoke one or more agents sequentially or concurrently (up to 10). Accepts either AgentInvocation objects or JSON strings.
 
 ### Tool Access Examples
 - **Read-only agent**: `["list_files", "read_file", "grep"]`
