@@ -71,6 +71,11 @@ _reload_count = 0
 class BaseAgent(ABC):
     """Base class for all agent configurations."""
 
+    # Class-level variables for global signal handling
+    _current_task = None
+    _original_signal_handler = None
+    _signal_handler_installed = False
+
     def __init__(self):
         self.id = str(uuid.uuid4())
         self._message_history: List[Any] = []
@@ -1296,44 +1301,111 @@ class BaseAgent(ABC):
         # Import shell process killer
         from code_puppy.tools.command_runner import kill_all_running_shell_processes
 
-        # Ensure the interrupt handler only acts once per task
-        def keyboard_interrupt_handler(sig, frame):
-            """Signal handler for Ctrl+C - replicating exact original logic"""
+        # Global reference to current task for signal handling
+        BaseAgent._current_task = agent_task
 
-            # First, nuke any running shell processes triggered by tools
+        # Global signal handler that handles ALL running operations
+        def global_emergency_stop_handler(sig, frame):
+            """Global emergency stop handler - cancels ALL operations immediately"""
+
+            emit_info("\n🛑 EMERGENCY STOP: Cancelling all operations...")
+
+            # 1. Kill all running shell processes first (highest priority)
             try:
                 killed = kill_all_running_shell_processes()
                 if killed:
-                    emit_info(f"Cancelled {killed} running shell process(es).")
-                else:
-                    # Only cancel the agent task if no shell processes were killed
-                    if not agent_task.done():
-                        agent_task.cancel()
+                    emit_info(f"   🛑 Killed {killed} shell process(es)")
             except Exception as e:
-                emit_info(f"Shell kill error: {e}")
-                if not agent_task.done():
-                    agent_task.cancel()
-            # Don't call the original handler
-            # This prevents the application from exiting
+                emit_info(f"   ⚠️  Error killing shell processes: {e}")
+
+            # 2. Stop all active spinners immediately
+            try:
+                from code_puppy.messaging.spinner import stop_all_spinners
+
+                stop_all_spinners()
+                emit_info("   🛑 Stopped all spinners")
+            except Exception as e:
+                emit_info(f"   ⚠️  Error stopping spinners: {e}")
+
+            # 3. Cancel the main agent task
+            global current_agent_task
+            try:
+                if BaseAgent._current_task and not BaseAgent._current_task.done():
+                    BaseAgent._current_task.cancel()
+                    emit_info("   🛑 Cancelled main agent task")
+            except Exception as e:
+                emit_info(f"   ⚠️  Error cancelling agent task: {e}")
+
+            # 4. Cancel ALL other async tasks (comprehensive cleanup)
+            try:
+                import asyncio
+
+                current_loop = asyncio.get_running_loop()
+                all_tasks = [
+                    task
+                    for task in asyncio.all_tasks(current_loop)
+                    if not task.done() and task != asyncio.current_task()
+                ]
+
+                for task in all_tasks:
+                    try:
+                        task.cancel()
+                    except Exception:
+                        pass  # Ignore errors when cancelling individual tasks
+
+                if all_tasks:
+                    emit_info(f"   🛑 Cancelled {len(all_tasks)} background task(s)")
+            except Exception as e:
+                emit_info(f"   ⚠️  Error cancelling background tasks: {e}")
+
+            # 5. Stop message queue consumer if running
+            try:
+                from code_puppy.messaging import get_global_queue
+
+                queue = get_global_queue()
+                if hasattr(queue, "_task") and queue._task and not queue._task.done():
+                    queue._task.cancel()
+                    emit_info("   🛑 Stopped message queue consumer")
+            except Exception as e:
+                emit_info(f"   ⚠️  Error stopping message queue: {e}")
+
+            # 6. Close MCP server connections if any
+            try:
+                if hasattr(self, "_mcp_servers") and self._mcp_servers:
+                    for server in self._mcp_servers:
+                        try:
+                            if hasattr(server, "close"):
+                                server.close()
+                        except Exception:
+                            pass
+                    emit_info("   🛑 Closed MCP server connections")
+            except Exception as e:
+                emit_info(f"   ⚠️  Error closing MCP servers: {e}")
+
+            emit_info("\n✅ Emergency stop complete. Returning to main prompt...")
+
+            # Important: Don't call the original handler
+            # This prevents the application from exiting and ensures we return to main prompt
+            pass
 
         try:
-            # Save original handler and set our custom one AFTER task is created
-            original_handler = signal.signal(signal.SIGINT, keyboard_interrupt_handler)
+            # Install the global emergency stop handler (persistent)
+            original_handler = signal.signal(
+                signal.SIGINT, global_emergency_stop_handler
+            )
+            BaseAgent._original_signal_handler = original_handler
+            BaseAgent._signal_handler_installed = True
 
             # Wait for the task to complete or be cancelled
             result = await agent_task
             return result
         except asyncio.CancelledError:
-            agent_task.cancel()
+            emit_info("\n✅ Operation cancelled successfully", group_id=group_id)
+            # Don't re-raise, let control return to main prompt
+            return None
         except KeyboardInterrupt:
-            # Handle direct keyboard interrupt during await
-            if not agent_task.done():
-                agent_task.cancel()
-            try:
-                await agent_task
-            except asyncio.CancelledError:
-                pass
-        finally:
-            # Restore original signal handler
-            if original_handler:
-                signal.signal(signal.SIGINT, original_handler)
+            # Direct keyboard interrupt during await
+            emit_info("\n✅ Operation cancelled by user", group_id=group_id)
+            # Don't re-raise, let control return to main prompt
+            return None
+        # Note: We don't restore the signal handler - it stays active for the entire session
