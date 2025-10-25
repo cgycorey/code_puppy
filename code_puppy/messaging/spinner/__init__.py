@@ -54,20 +54,6 @@ def clear_spinner_context() -> None:
     SpinnerBase.clear_context_info()
 
 
-def stop_all_spinners() -> None:
-    """Immediately stop all active spinners - used for emergency cancellation."""
-    # Make a copy of the list to avoid modification during iteration
-    spinners_to_stop = list(_active_spinners)
-    for spinner in spinners_to_stop:
-        try:
-            spinner.stop()
-        except Exception:
-            # Ignore errors when stopping spinners
-            pass
-    # Clear the list to ensure they're all unregistered
-    _active_spinners.clear()
-
-
 __all__ = [
     "SpinnerBase",
     "TextualSpinner",
@@ -78,5 +64,4 @@ __all__ = [
     "resume_all_spinners",
     "update_spinner_context",
     "clear_spinner_context",
-    "stop_all_spinners",
 ]

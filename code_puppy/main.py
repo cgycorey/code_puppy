@@ -505,20 +505,13 @@ async def interactive_mode(message_renderer, initial_command: str = None) -> Non
                 # No need to get agent directly - use manager's run methods
 
                 # Use our custom helper to enable attachment handling with spinner support
-                try:
-                    result = await run_prompt_with_attachments(
-                        current_agent,
-                        task,
-                        spinner_console=message_renderer.console,
-                    )
-                    # Check if the task was cancelled (but don't show message if we just killed processes)
-                    if result is None:
-                        continue
-                except (asyncio.CancelledError, KeyboardInterrupt):
-                    # Operation was cancelled by the emergency stop handler
-                    # Just continue to the next prompt
-                    from code_puppy.messaging import emit_info
-                    emit_info("\n✅ Ready for next command...")
+                result = await run_prompt_with_attachments(
+                    current_agent,
+                    task,
+                    spinner_console=message_renderer.console,
+                )
+                # Check if the task was cancelled (but don't show message if we just killed processes)
+                if result is None:
                     continue
                 # Get the structured response
                 agent_response = result.output
